@@ -6,7 +6,8 @@ lines = [line[:-1] for line in stdin]
 def part1(lines):
     s = 0
     for line in lines:
-        if len(set(line.split(" "))) == len(line.split(" ")):
+        split = line.split(" ")
+        if len(set(split)) == len(split):
             s += 1
     return s
 
