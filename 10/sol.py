@@ -1,102 +1,64 @@
-lengths = [int(n) for n in input().split(",")]
+import sys
+sys.path.append('../knot-hash')
+from knot_hash import knot_hash, reverse
 
-N = 5
+#N = 256 
 
-class Node:
-    def __init__(self, val):
-        self.val = val
-        self.next = None
-        self.prev = None
+#def build(n):
+#    return list(range(n))
 
-    
-    # insert after
-    def insert_after(self, other):
-        last = other
-        while last.next:
-            last = last.next
+#def reverse(arr, s, l):
+#    for i in range((l // 2) + 1):
+#        si = (s + i) % len(arr)
+#        ei = (s + l - i) % len(arr)
+#        #print(si, ei)
+#        arr[si], arr[ei] = arr[ei], arr[si]
 
-        nxt = self.next
-        self.next = other
-        other.prev = self
-        last.next = nxt
-        if nxt:
-            nxt.prev = last
+#def format(arr, i):
+#    return " ".join(str(n) if j!=i else f"[{n}]" for j, n in enumerate(arr))
 
-    def __repr__(self):
-        node = self
-        s = set()
-        res = []
-        while node and node.val not in s:
-            res.append(str(node.val))
-            s.add(node.val)
-            node = node.next
-        return "->".join(res) + "|"
+#def part1(arr, lengths):
+#    ss = cur = 0
+#    for l in lengths:
+#        reverse(arr, cur, l - 1)
+#        cur = (cur + l + ss) % len(arr)
+#        ss += 1
+#    return arr[0] * arr[1]
 
-    # 3->2->1->0->3
-    # removes from self to n
-    def trim(self, n):
-        node = self
-        for _ in range(n - 1):
-            node = node.next
-        prv = self.prev
-        node.next.prev = self.prev
-        self.prev.next = node.next
-        nxt = node.next
-        node.next = self.prev = None
-        return prv, nxt
+#def chunks(arr, size):
+#    for i in range(0, len(arr), size):
+#        yield arr[i:i + size]
 
-    def __iter__(self):
-        s = set()
-        node = self
-        while node and node not in s:
-            yield node
-            s.add(node)
-            node = node.next
+#def xor(l):
+#    res = 0
+#    for n in l:
+#        res ^= n
+#    return res
 
-    def reverse(self):
-        l = list(self)
-        for node in l:
-            node.next, node.prev = node.prev, node.next
-        return node
+#def part2(arr, lengths):
+#    lengths.extend([17, 31, 73, 47, 23])
+#    ss = cur = 0
+#    for _ in range(64):
+#        for l in lengths:
+#            reverse(arr, cur, l - 1)
+#            cur = (cur + l + ss) % len(arr)
+#            ss += 1
+#    sparse = [xor(chunk) for chunk in chunks(arr, 16)]
+#    return "".join(f"{n:02x}" for n in sparse)
 
-    def advance(self, n):
-        node = self
-        for _ in range(n):
-            node = node.next
-        return node
-
-    def __repr__(self):
-        res = []
-        for node in self:
-            prv = node.prev.val if node.prev else "_"
-            res.append(f"{node.val}({prv})")
-        return "->".join(res) + "|"
-
-def build(n):
-    d = [Node(0)]
-    for i in range(1, n):
-        node = Node(i)
-        d[i - 1].insert_after(node)
-        d.append(node)
-    d[-1].next = d[0]
-    d[0].prev = d[-1]
-    return d
-
-def part1(nodes, lengths):
-    ss = 0
-    node = nodes[0]
-    for i, l in enumerate(lengths):
-        if l == N:
-            node = node.reverse()
-        else:
-            prv, nxt = node.trim(l)
-            node = node.reverse()
-            prv.insert_after(node)
-        node = node.advance((l + ss) % N)
+def part1(arr, lengths):
+    ss = cur = 0
+    for l in lengths:
+        reverse(arr, cur, l - 1)
+        cur = (cur + l + ss) % len(arr)
         ss += 1
-    print(node)
-    return node.val * node.next.val
-    
+    return arr[0] * arr[1]
 
-nodes = build(N)
-print(part1(nodes, lengths))
+txt = input()
+
+# p1
+print(part1(list(range(256)), [int(n) for n in txt.split(",")]))
+
+# p2
+#print(part2(arr, [ord(c) for c in txt]))
+print(knot_hash(txt))
